@@ -23,7 +23,7 @@ public abstract class GeradorArquivos {
         this.posProcessador = posProcessador;
     }
 
-    public final void gerarArquivos(String nome, Map<String, Object> propriedades) throws IOException {
+    public void gerarArquivos(String nome, Map<String, Object> propriedades) throws IOException {
         String conteudo = gerarConteudo(propriedades);
         byte[] dados = conteudo.getBytes(StandardCharsets.UTF_8);
         dados = posProcessador.processar(dados);

@@ -4,11 +4,13 @@ import aubay.com.dia1.dao.ServicoProduto;
 import aubay.com.dia1.dao.ServicoVenda;
 import aubay.com.dia1.entidade.Produto;
 import aubay.com.dia1.entidade.Venda;
+import aubay.com.dia1.geradores.GeradorArquivosComposite;
 import aubay.com.dia1.geradores.GeradorJson;
 import aubay.com.dia1.geradores.GeradorPropriedades;
 import aubay.com.dia1.geradores.GeradorXml;
 import aubay.com.dia1.posprocessadores.CompactadorPosProcesador;
 import aubay.com.dia1.posprocessadores.CriptografadorPosProcessador;
+import aubay.com.dia1.posprocessadores.PosProcessadorComposto;
 
 import java.io.IOException;
 
@@ -61,8 +63,18 @@ public class Main {
         servicoProdutoJsonCrip.gravarEntidadeEmArquivo(id, "testJsonCrip");
 
         GeradorXml geradorXmlVenda = new GeradorXml();
+        geradorXmlVenda.setPosProcessador(new PosProcessadorComposto(new CriptografadorPosProcessador(25),
+                new CompactadorPosProcesador()));
         ServicoVenda servicoVendaXml = new ServicoVenda(geradorXmlVenda);
         servicoVendaXml.getDao().salvar(new Venda(id, 200, 123.45));
-        servicoVendaXml.gravarEntidadeEmArquivo(id, "venda.xml");
+        servicoVendaXml.gravarEntidadeEmArquivo(id, "vendaComposto.zip");
+
+        GeradorArquivosComposite geradorArquivosComposite = new GeradorArquivosComposite(geradorJsonCrip, geradorJson, ".crip", ".jsonComposite");
+        GeradorArquivosComposite geradorArquivosComposite2 = new GeradorArquivosComposite(geradorArquivosComposite, geradorXml, "", ".xml");
+        ServicoProduto servicoComposite = new ServicoProduto(geradorArquivosComposite2);
+        servicoComposite.getDao().salvar(new Produto(id, "teste", 123.45));
+        servicoComposite.gravarEntidadeEmArquivo(id, "composite");
+
+
     }
 }
